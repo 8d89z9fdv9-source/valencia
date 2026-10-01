@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f1efe5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Valencia">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>Valencia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Work+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Dashboard a griglia: "adesso" + numeri in alto, mappa e lista cose da fare al centro, programma e info sotto. Stile carta di "Piano 2000". */
+  :root{
+    --paper:#f1efe5; --raised:#e9e6d8; --card:#f7f5ee; --ink:#23261e; --muted:#5b5f52; --rule:#cfcbb9;
+    --olive:#4b5d3a; --olive-soft:#e2e6d6; --terra:#b1633f; --terra-soft:#f1ded3; --sea:#7f9aa3; --sea-soft:#dfe6e4;
+    --serif:"Fraunces",Georgia,serif; --sans:"Work Sans",ui-sans-serif,system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --paper:#1b1d16; --raised:#24261d; --card:#202219; --ink:#ece8da; --muted:#a8ac98; --rule:#3c3f30;
+    --olive:#9cba80; --olive-soft:#2b3323; --terra:#e0946c; --terra-soft:#3a2a20; --sea:#8fb0b8; --sea-soft:#22302f; color-scheme:dark}}
+  :root[data-theme="dark"]{
+    --paper:#1b1d16; --raised:#24261d; --card:#202219; --ink:#ece8da; --muted:#a8ac98; --rule:#3c3f30;
+    --olive:#9cba80; --olive-soft:#2b3323; --terra:#e0946c; --terra-soft:#3a2a20; --sea:#8fb0b8; --sea-soft:#22302f; color-scheme:dark}
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;
+    padding-inline:clamp(16px,4vw,32px);padding-block:clamp(24px,5vw,48px) 72px}
+  .page{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+  a{color:var(--olive)}
+  :focus-visible{outline:2px solid var(--olive);outline-offset:2px}
+  .eyebrow{font:11.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  h1{font:500 clamp(36px,6vw,52px)/1 var(--serif);margin:0;letter-spacing:-.015em}
+  h2{font:500 21px/1.2 var(--serif);margin:0;color:var(--olive)}
+  h3{font:500 15px/1.35 var(--sans);margin:0}
+  p{margin:0}
+  .muted{color:var(--muted)}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  svg.ill{stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+  .panel{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+  .head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+  /* Hero */
+  .hero{display:grid;grid-template-columns:1fr 1.4fr;gap:20px;align-items:end}
+  .hero .title{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+  .hero svg{width:100%;height:auto;color:var(--olive)}
+  .hero svg .t{color:var(--terra)} .hero svg .s{color:var(--sea)}
+
+  /* Top row */
+  .top{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+  .now{background:var(--olive);color:var(--paper);border-color:var(--olive)}
+  .now .eyebrow{color:var(--paper);opacity:.75}
+  .now .what{font:500 clamp(22px,3vw,28px)/1.2 var(--serif)}
+  .now .when{font:14px var(--mono);opacity:.85}
+  .now .after{border-top:1px solid color-mix(in srgb,var(--paper) 30%,transparent);padding-top:12px;font-size:14px;opacity:.9;display:flex;justify-content:space-between;gap:12px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .stats div{background:var(--raised);padding:14px;display:flex;flex-direction:column;gap:2px}
+  .stats .num{font:500 24px var(--mono);font-variant-numeric:tabular-nums}
+  .stats .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  /* Main row */
+  .main{display:flex;flex-direction:column;gap:20px}
+  .mapgrid{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  .mapwrap{position:relative;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--paper)}
+  #map{height:460px;width:100%}
+  .maplibregl-map{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;font:inherit}
+  .maplibregl-canvas{position:absolute;left:0;top:0}
+  .maplibregl-canvas-container.maplibregl-interactive{cursor:grab}
+  .maplibregl-canvas-container.maplibregl-interactive:active{cursor:grabbing}
+  .maplibregl-marker{position:absolute;top:0;left:0;will-change:transform}
+  .mk{all:unset;cursor:pointer;display:grid;justify-items:center;align-items:center;width:34px;height:34px;position:absolute;top:0;left:0;will-change:transform}
+  .mk .b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.28);transition:transform .15s}
+  .mk.eat .b{background:#f5922f} .mk.see .b{background:#e8578a} .mk.home .b{background:#8e5cd9}
+  .mk em{position:absolute;top:33px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 11.5px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text",var(--sans);font-style:normal;color:#3a3a3c;
+    text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff,0 0 4px #fff;pointer-events:none;opacity:0;transition:opacity .15s}
+  .mk.eat em{color:#b3600f} .mk.see em{color:#b8325f} .mk.home em{color:#6a3fb5}
+  #map.zl .mk em,.mk.on em,.mk.home em{opacity:1}
+  .mk.on{z-index:3} .mk.home{z-index:2}
+  .mk.on .b{transform:scale(1.3) translateY(-3px)}
+  .mk:focus-visible .b{outline:3px solid #0a84ff;outline-offset:2px}
+  .me{width:22px;height:22px;position:relative;pointer-events:none}
+  .me i{position:absolute;border-radius:50%}
+  .me .dot{inset:2px;background:#0a84ff;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .me .pulse{inset:-14px;background:rgba(10,132,255,.18);animation:mepulse 2.4s ease-out infinite}
+  .me .cone{display:none;width:90px;height:90px;left:-34px;top:-34px;background:conic-gradient(from -28deg,rgba(10,132,255,.38),rgba(10,132,255,0) 56deg,transparent 0);
+    -webkit-mask:radial-gradient(circle,#000 0 38%,transparent 72%);mask:radial-gradient(circle,#000 0 38%,transparent 72%);transform:rotate(var(--h,0deg))}
+  .me.dir .cone{display:block}
+  @keyframes mepulse{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.15);opacity:0}}
+  @media (prefers-reduced-motion:reduce){.me .pulse{animation:none}}
+  .ld{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:0}
+  .ld.eat{background:#f5922f} .ld.see{background:#e8578a} .ld.home{background:#8e5cd9}
+  .detail .from dt.wk{color:#0a84ff;font-weight:500} .detail .from dt.l5{color:#3aa655;font-weight:500}
+  .detail .from b{font-weight:600}
+  .mapctl,.mapview{position:absolute;display:flex;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .mapctl{right:10px;top:10px;flex-direction:column}
+  .mapview{left:10px;top:10px}
+  .mapctl button,.mapview button{all:unset;cursor:pointer;background:var(--card);color:var(--ink);font:500 13px var(--sans);padding:7px 11px;text-align:center}
+  .mapctl button{font-size:17px;width:34px;padding:4px 0}
+  .mapctl button:hover,.mapview button:hover{color:var(--olive)}
+  .mapctl button:focus-visible,.mapview button:focus-visible{outline:2px solid var(--olive);outline-offset:-2px}
+  .memsg{position:absolute;left:10px;right:56px;top:52px;margin:0;background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:9px 11px;font-size:13px;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  #z-me.on{color:var(--paper);background:var(--olive)}
+  .attr{position:absolute;right:6px;bottom:4px;font:10px var(--mono);color:var(--muted);background:color-mix(in srgb,var(--paper) 80%,transparent);padding:1px 5px;border-radius:2px}
+  @media (max-width:520px){#map{height:380px}}
+  .map .land{fill:var(--raised)} .map .seaf{fill:var(--sea-soft)}
+  .map .coast{stroke:var(--sea);fill:none;stroke-width:1.4}
+  .map .river{stroke:var(--olive);stroke-opacity:.28;fill:none;stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+  .map .road{stroke:var(--rule);fill:none;stroke-width:3;stroke-linecap:round}
+  .map .old{fill:var(--paper);stroke:var(--rule);stroke-dasharray:3 3}
+  .map .route{stroke:var(--terra);fill:none;stroke-width:1.8;stroke-dasharray:5 4;opacity:0;transition:opacity .2s}
+  .map .route.on{opacity:1}
+  .map .lab{font:10.5px var(--mono);fill:var(--muted);letter-spacing:.04em}
+  .map .area{font:italic 500 13px var(--serif);fill:var(--olive)}
+  .map .pin{cursor:pointer}
+  .map .pin .hit{fill:transparent}
+  .map .pin .p{fill:var(--card);stroke:var(--olive);stroke-width:1.6}
+  .map .pin.eat .p{stroke:var(--terra)}
+  .map .pin:hover .p,.map .pin.on .p{fill:var(--olive)}
+  .map .pin.eat:hover .p,.map .pin.eat.on .p{fill:var(--terra)}
+  .map .pin.on .ring{opacity:1}
+  .map .ring{fill:none;stroke:var(--olive);stroke-width:1.2;opacity:0}
+  .map .pin.eat .ring{stroke:var(--terra)}
+  .map .pin:focus-visible{outline:none} .map .pin:focus-visible .p{stroke-width:3}
+  .map .home .p{fill:var(--terra);stroke:var(--card);stroke-width:2}
+  .map .metro rect{fill:var(--card);stroke:var(--muted)} .map .metro text{font:600 9px var(--mono);fill:var(--muted)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font:11.5px var(--mono);color:var(--muted)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.6px solid var(--olive);margin-right:5px;vertical-align:-1px}
+  .legend i.e{border-color:var(--terra)} .legend i.h{background:var(--terra);border-color:var(--terra)}
+
+  .detail{display:flex;flex-direction:column;gap:12px}
+  .detail .name{font:500 22px/1.2 var(--serif)}
+  .detail .from{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
+  .detail .from dt{color:var(--muted)} .detail .from dd{margin:0}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{font:500 13.5px var(--sans);padding:10px 14px;border-radius:4px;text-decoration:none;border:1px solid var(--olive);color:var(--olive);display:inline-flex;align-items:center;gap:6px}
+  .btn.primary{background:var(--olive);color:var(--paper)}
+  .btn:hover{opacity:.88}
+  .places{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:250px;overflow:auto;border-top:1px solid var(--rule)}
+  .places button{all:unset;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid var(--rule);cursor:pointer;font-size:14px}
+  .places button:hover,.places button.on{color:var(--olive)}
+  .places button:focus-visible{outline:2px solid var(--olive)}
+  .places button span:last-child{font:12px var(--mono);color:var(--muted);white-space:nowrap}
+  .hint{font-size:13px;color:var(--muted);line-height:1.5}
+
+  .filters{display:flex;gap:6px;flex-wrap:wrap}
+  .f{font:12px/1 var(--mono);padding:7px 11px;border:1px solid var(--rule);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer}
+  .f:hover{border-color:var(--olive);color:var(--ink)}
+  .f[aria-pressed="true"]{background:var(--olive);border-color:var(--olive);color:var(--paper)}
+
+  .progress{display:flex;align-items:center;gap:10px}
+  .bar{flex:1;height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+  .bar span{display:block;height:100%;background:var(--olive);width:0;transition:width .3s}
+  .count{font:13px var(--mono);color:var(--muted);white-space:nowrap}
+
+  .todos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,215px),1fr));gap:10px}
+  .todo{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;text-align:left;padding:12px;border:1px solid var(--rule);border-radius:5px;background:var(--paper);color:var(--ink);font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+  .todo:hover{border-color:var(--olive)}
+  .todo .ic{width:44px;height:44px;border-radius:4px;background:var(--olive-soft);color:var(--olive);display:grid;place-items:center}
+  .todo.eat .ic{background:var(--terra-soft);color:var(--terra)}
+  .todo .ic svg{width:30px;height:30px}
+  .todo h3{font-size:14.5px}
+  .todo p{font-size:13px;color:var(--muted);line-height:1.4;margin-top:2px}
+  .todo .z{font:11px var(--mono);color:var(--muted);letter-spacing:.04em;margin-top:6px;display:block}
+  .tw{position:relative;display:grid}
+  .tw[hidden]{display:none}
+  .tw .todo{padding-right:40px}
+  .goto{position:absolute;right:8px;bottom:8px;width:28px;height:28px;border-radius:4px;border:1px solid var(--rule);background:var(--card);color:var(--muted);cursor:pointer;display:grid;place-items:center}
+  .goto:hover{border-color:var(--olive);color:var(--olive)}
+  .goto svg{width:15px;height:15px}
+  .todo[aria-pressed="true"]{background:var(--olive-soft);border-color:var(--olive-soft)}
+  .todo[aria-pressed="true"] h3{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+  .todo[aria-pressed="true"] .ic{background:var(--olive);color:var(--paper)}
+  .todo[hidden]{display:none}
+
+  /* Program */
+  .tabs{display:flex;gap:6px}
+  .rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;position:relative}
+  .rows li{display:grid;grid-template-columns:56px 14px 1fr;gap:12px;padding:8px 0}
+  .rows time{font:13.5px var(--mono);color:var(--muted);padding-top:1px}
+  .rows .dot{position:relative}
+  .rows .dot::before{content:"";position:absolute;left:6px;top:0;bottom:-16px;width:1px;background:var(--rule)}
+  .rows li:last-child .dot::before{display:none}
+  .rows .dot::after{content:"";position:absolute;left:2px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--card);border:1px solid var(--muted)}
+  .rows li.key .dot::after{border-color:var(--terra);background:var(--terra)}
+  .rows li.past{opacity:.45}
+  .rows li.cur time{color:var(--olive);font-weight:500}
+  .rows li.cur .dot::after{background:var(--olive);border-color:var(--olive);box-shadow:0 0 0 4px var(--olive-soft)}
+  .rows .note{color:var(--muted);font-size:13.5px}
+
+  .bottom{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start}
+  .side{display:flex;flex-direction:column;gap:20px}
+
+  .pass{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px 0;border-bottom:1px dashed var(--rule)}
+  .pass:last-of-type{border-bottom:0}
+  .pass .code{font:500 26px var(--mono);letter-spacing:.02em}
+  .pass .code small{display:block;font:12px var(--mono);color:var(--muted);letter-spacing:0}
+  .pass .mid{text-align:center;font:11.5px var(--mono);color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+  .pass .mid svg{width:56px;height:14px;color:var(--terra)}
+  .pass .r{text-align:right}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin:0}
+  .kv dt{color:var(--muted)} .kv dd{margin:0}
+  .copy{font:12px var(--mono);border:1px solid var(--rule);background:transparent;color:var(--muted);border-radius:3px;padding:2px 7px;cursor:pointer;margin-left:6px}
+  .copy:hover{border-color:var(--olive);color:var(--ink)}
+
+  .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .list li{display:flex;justify-content:space-between;gap:16px;font-size:14px;padding:9px 0;border-bottom:1px solid var(--rule)}
+  .list li:last-child{border-bottom:0}
+  .list li span:last-child{font:12.5px var(--mono);color:var(--muted);text-align:right;white-space:nowrap}
+  .chip{font:12px var(--mono);padding:3px 8px;border-radius:3px;display:inline-block;background:var(--terra-soft);color:var(--terra)}
+
+  footer{font-size:13.5px;color:var(--muted);line-height:1.6;padding-top:8px}
+
+  @media (max-width:860px){
+    .hero,.top,.mapgrid,.bottom{grid-template-columns:1fr}
+    .hero svg{max-height:150px}
+  }
+  @media (max-width:520px){
+    .list li{flex-direction:column;gap:0}
+    .list li span:last-child{text-align:left}
+    .pass .code{font-size:22px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<!-- Icone riutilizzabili -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-paella" viewBox="0 0 48 48"><ellipse cx="24" cy="26" rx="16" ry="9"/><ellipse cx="24" cy="25" rx="12" ry="6"/><path d="M8 26H3M45 26h-5"/><circle cx="19" cy="24" r="1.4"/><circle cx="27" cy="23" r="1.4"/><circle cx="29" cy="27" r="1.4"/><path d="M21 27l3-1.5"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 48 48"><circle cx="24" cy="18" r="6"/><path d="M24 6v3M14 10l2 2M34 10l-2 2"/><path d="M5 30c4-3 8-3 12 0s8 3 12 0 8-3 13 0M5 37c4-3 8-3 12 0s8 3 12 0 8-3 13 0"/></symbol>
+    <symbol id="i-wine" viewBox="0 0 48 48"><path d="M17 7h14l-1 10a6 6 0 0 1-12 0z"/><path d="M18 13h12M24 23v15M18 38h12"/></symbol>
+    <symbol id="i-horchata" viewBox="0 0 48 48"><path d="M15 14h18l-3 27H18z"/><path d="M27 14l5-9M16.5 22h15"/><path d="M36 30c3 0 5 2 5 4s-2 4-5 4" /></symbol>
+    <symbol id="i-market" viewBox="0 0 48 48"><path d="M7 40h34M11 40V24M37 40V24M8 24h32M12 24c0-8 6-13 12-13s12 5 12 13M24 11V5"/><path d="M19 40v-9h10v9M15 29h2M31 29h2"/></symbol>
+    <symbol id="i-tower" viewBox="0 0 48 48"><path d="M18 42V17h12v25M15 42h18M18 17l6-9 6 9M24 8V4M22 23h4v6h-4zM18 33h12"/></symbol>
+    <symbol id="i-lonja" viewBox="0 0 48 48"><path d="M7 40h34M12 40V19M24 40V19M36 40V19M12 19c0-7 12-7 12 0 0-7 12-7 12 0M8 13h32M10 13l2-4h24l2 4"/></symbol>
+    <symbol id="i-calatrava" viewBox="0 0 48 48"><path d="M4 32C9 16 39 16 44 32"/><path d="M10 32c4-9 24-9 28 0"/><path d="M4 32h40M16 32v-6M24 32v-8M32 32v-6"/><path d="M6 38h36" stroke-dasharray="2 3"/></symbol>
+    <symbol id="i-tree" viewBox="0 0 48 48"><path d="M24 40V22"/><path d="M24 22c-6-1-11-5-12-11 6 0 10 3 12 7 2-4 6-7 12-7-1 6-6 10-12 11z"/><path d="M24 26c-3-6-1-14 0-18 1 4 3 12 0 18M14 40h20"/></symbol>
+    <symbol id="i-cocktail" viewBox="0 0 48 48"><path d="M11 10h26L24 26z M24 26v12M18 38h12"/><circle cx="33" cy="9" r="4"/><path d="M16 15h16"/></symbol>
+    <symbol id="i-bocadillo" viewBox="0 0 48 48"><path d="M6 25c0-5 8-8 18-8s18 3 18 8c0 3-2 5-5 5H11c-3 0-5-2-5-5z"/><path d="M8 30c2 3 6 4 16 4s14-1 16-4M14 21l2-1M22 19h2M30 20l2 1"/></symbol>
+    <symbol id="i-pumpkin" viewBox="0 0 48 48"><path d="M24 14c-10 0-15 6-15 13s6 12 15 12 15-5 15-12-5-13-15-13z"/><path d="M24 14c-4 6-4 19 0 25M24 14c4 6 4 19 0 25M24 14c0-3 1-6 4-7"/></symbol>
+    <symbol id="i-sweet" viewBox="0 0 48 48"><rect x="10" y="16" width="28" height="14" rx="7"/><path d="M16 23h16"/><path d="M14 36h20" stroke-dasharray="2 3"/></symbol>
+    <symbol id="i-tiles" viewBox="0 0 48 48"><rect x="8" y="8" width="14" height="14"/><rect x="26" y="8" width="14" height="14"/><rect x="8" y="26" width="14" height="14"/><rect x="26" y="26" width="14" height="14"/><circle cx="15" cy="15" r="3"/><circle cx="33" cy="33" r="3"/><path d="M26 8l14 14M22 26L8 40"/></symbol>
+    <symbol id="i-boat" viewBox="0 0 48 48"><path d="M8 30h32l-4 7H12z"/><path d="M24 30V8l12 18H24M24 12l-9 14h9"/><path d="M5 41c4-2 8-2 12 0s8 2 12 0 8-2 14 0"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 56 14"><path d="M2 7h44" stroke-dasharray="2 3"/><path d="M46 3l8 4-8 4z" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="title">
+      <span class="eyebrow">30 ottobre – 1 novembre</span>
+      <h1>Valencia</h1>
+    </div>
+    <svg class="ill" viewBox="0 0 640 150" role="img" aria-label="Il Micalet, la Città delle Arti e il mare">
+      <circle class="t" cx="520" cy="44" r="18"/>
+      <path class="s" d="M400 118c14-6 28-6 42 0s28 6 42 0 28-6 42 0 28 6 42 0 28-6 42 0M420 132c14-6 28-6 42 0s28 6 42 0 28-6 42 0 28 6 42 0"/>
+      <path d="M20 118h380"/>
+      <!-- Micalet -->
+      <path d="M60 118V50h26v68M56 118h34M60 50l13-18 13 18M73 32V22M66 62h14M66 78h14v12H66z"/>
+      <!-- cupola -->
+      <path d="M104 118V92h40v26M100 92h48M108 92c0-14 8-22 16-22s16 8 16 22M124 70v-8"/>
+      <!-- Calatrava -->
+      <path d="M190 118c18-58 150-58 172 0"/>
+      <path d="M214 118c14-38 110-38 124 0"/>
+      <path d="M238 118V96M262 118V88M286 118V86M310 118V90"/>
+      <path class="s" d="M190 126h172" stroke-dasharray="3 5"/>
+      <!-- palma -->
+      <path d="M392 118c-2-24 0-46 6-62"/>
+      <path d="M398 56c-10-6-22-4-28 4M398 56c8-10 20-10 28-4M398 56c-2-10-10-16-20-16M398 56c6-8 16-10 22-6M398 56c2 8 0 16-6 22"/>
+    </svg>
+  </header>
+
+  <!-- ADESSO + NUMERI -->
+  <div class="top">
+    <div class="panel now" aria-live="polite">
+      <span class="eyebrow" id="now-label">Prossimo</span>
+      <div class="what" id="now-what">—</div>
+      <div class="when" id="now-when">—</div>
+      <div class="after"><span id="after-what">—</span><span class="mono" id="after-when"></span></div>
+    </div>
+    <div class="stats">
+      <div><span class="num" id="days">—</span><span class="lbl" id="days-lbl">Giorni alla partenza</span></div>
+      <div><span class="num">23° / 14°</span><span class="lbl">Max / min</span></div>
+      <div><span class="num">21°</span><span class="lbl">Mare</span></div>
+      <div><span class="num">18:05</span><span class="lbl">Tramonto</span></div>
+    </div>
+  </div>
+
+  <!-- MAPPA + DA FARE -->
+  <div class="main">
+    <div class="panel map">
+      <div class="head"><h2>Mappa</h2>
+        <div class="legend"><span><i class="ld home"></i>hotel</span><span><i class="ld see"></i>vedere</span><span><i class="ld eat"></i>mangiare</span><span><i class="ld" style="background:#0a84ff"></i>a piedi</span><span><i class="ld" style="background:#3aa655"></i>metro L5</span></div>
+      </div>
+      <div class="mapgrid">
+        <div class="mapwrap">
+          <div id="map" role="region" aria-label="Mappa di Valencia con i posti del viaggio"></div>
+          <div class="mapctl"><button id="z-in" aria-label="Ingrandisci">+</button><button id="z-out" aria-label="Riduci">−</button></div>
+          <div class="mapview"><button id="z-center">Centro</button><button id="z-all">Tutto</button><button id="z-me">La mia posizione</button></div>
+          <p class="memsg" id="me-msg" hidden></p>
+          <span class="attr">© OpenStreetMap · OpenFreeMap</span>
+        </div>
+        <div class="detail" aria-live="polite">
+          <span class="eyebrow" id="d-zone">Cabanyal</span>
+          <div class="name" id="d-name">Kora Lluna</div>
+          <p class="muted" id="d-note"></p>
+          <dl class="from" id="d-from"></dl>
+          <div class="btns">
+            <a class="btn primary" id="d-go" target="_blank" rel="noopener">Portami qui</a>
+            <a class="btn" id="d-open" target="_blank" rel="noopener">Apple Maps</a>
+          </div>
+          <p class="hint">Il percorso parte dalla vostra posizione attuale, a piedi se è vicino, altrimenti con i mezzi. "Portami qui" usa Google Maps.</p>
+          <ul class="places" id="places"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="head"><h2>Da fare</h2>
+        <div class="filters" role="group" aria-label="Filtra">
+          <button class="f" data-f="all" aria-pressed="true">Tutto</button>
+          <button class="f" data-f="eat" aria-pressed="false">Mangiare</button>
+          <button class="f" data-f="see" aria-pressed="false">Vedere</button>
+        </div>
+      </div>
+      <div class="progress"><div class="bar"><span id="bar"></span></div><span class="count" id="count">0 / 0</span></div>
+      <div class="todos" id="todos"></div>
+    </div>
+  </div>
+
+  <!-- PROGRAMMA + INFO -->
+  <div class="bottom">
+    <div class="panel">
+      <div class="head">
+        <h2>Programma</h2>
+        <div class="tabs" role="tablist" aria-label="Giorno">
+          <button class="f" role="tab" data-day="0" aria-pressed="true">Ven 30</button>
+          <button class="f" role="tab" data-day="1" aria-pressed="false">Sab 31</button>
+          <button class="f" role="tab" data-day="2" aria-pressed="false">Dom 1</button>
+        </div>
+      </div>
+      <ul class="rows" id="rows"></ul>
+    </div>
+
+    <div class="side">
+      <div class="panel">
+        <h2>Voli</h2>
+        <div>
+          <div class="pass">
+            <div class="code">MXP<small>14:00</small></div>
+            <div class="mid">Ven 30 · FR7470<svg class="ill" viewBox="0 0 56 14"><use href="#i-plane"/></svg>Ryanair</div>
+            <div class="code r">VLC<small>15:55</small></div>
+          </div>
+          <div class="pass">
+            <div class="code">VLC<small>14:25</small></div>
+            <div class="mid">Dom 1 · W46414<svg class="ill" viewBox="0 0 56 14"><use href="#i-plane"/></svg>Wizz Air</div>
+            <div class="code r">MXP<small>16:25</small></div>
+          </div>
+        </div>
+        <p><span class="chip">Solo zaino sotto il sedile</span></p>
+      </div>
+
+      <div class="panel">
+        <h2>Kora Lluna</h2>
+        <dl class="kv">
+          <dt>Indirizzo</dt><dd>C/ de l'Arquitecte Alfaro 44 · <a href="https://www.google.com/maps/search/?api=1&query=Kora+Lluna+Valencia" target="_blank" rel="noopener">mappa</a></dd>
+          <dt>Check-in</dt><dd class="mono">dalle 16:00</dd>
+          <dt>Check-out</dt><dd class="mono">entro le 12:00</dd>
+          <dt>Reception</dt><dd class="mono">+34 910 05 93 96<button class="copy" data-copy="+34910059396">copia</button></dd>
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2>Halloween</h2>
+        <ul class="list">
+          <li><span>Ruzafa e Carmen in maschera</span><span>gratis</span></li>
+          <li><span>Festa al Mercado del Grao</span><span>dalle 17:00</span></li>
+          <li><span>Rocky Horror a La Rambleta</span><span>sera</span></li>
+          <li><span>Horror show con cena</span><span>21:00 · €42</span></li>
+          <li><span>Reaper Festival</span><span>23:00 – 07:00</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Il meteo indica le medie di fine ottobre: qualche giorno prima controllate <a href="https://www.aemet.es/es/eltiempo/prediccion/municipios/valencia-id46250" target="_blank" rel="noopener">AEMET</a>. Per ora non risultano scioperi dei mezzi annunciati per quei giorni.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script>
+(function(){
+  var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+  /* ---------- Luoghi (coordinate verificate su OpenStreetMap) ---------- */
+  var HOTEL_Q="Kora Lluna, Carrer de l'Arquitecte Alfaro 44, 46011 València";
+  var P=[
+    {id:'hotel',n:'Kora Lluna',z:'Cabanyal',k:'home',a:39.46483,o:-0.33464,q:HOTEL_Q,d:'Il vostro hotel, a 6 minuti a piedi dalla metro Marítim. Reception aperta 24 ore.'},
+    {id:'spiaggia',n:'Spiaggia del Cabanyal',z:'Cabanyal',k:'see',a:39.46890,o:-0.32276,q:'Platja del Cabanyal, València',d:'Prosegue verso nord nella Malvarrosa.'},
+    {id:'montana',n:'Casa Montaña',z:'Cabanyal',k:'eat',a:39.46557,o:-0.33090,q:'Casa Montaña, Carrer de Josep Benlliure 69, València',d:'Tapas e vini dal 1836. Prenotare.'},
+    {id:'pascuala',n:'Bodega La Pascuala',z:'Cabanyal',k:'eat',a:39.47395,o:-0.32754,q:'Bodega La Pascuala, Carrer del Doctor Lluch 299, València',d:'Bocadillos giganti. Chiusa la domenica.'},
+    {id:'carmela',n:'Casa Carmela',z:'Malvarrosa',k:'eat',a:39.48225,o:-0.32582,q:'Casa Carmela, Carrer d\'Isabel de Villena 155, València',d:'Paella a legna sul mare, solo a pranzo.'},
+    {id:'pepica',n:'La Pepica',z:'Lungomare',k:'eat',a:39.46340,o:-0.32347,q:'La Pepica, Passeig de Neptú 6, València',d:'Paella storica sul lungomare.'},
+    {id:'marina',n:'Marina e Veles e Vents',z:'Porto',k:'see',a:39.46110,o:-0.32420,q:'Veles e Vents, València',d:'Passeggiata sul porto.'},
+    {id:'mercado',n:'Mercado Central e Lonja',z:'Centro',k:'see',a:39.47349,o:-0.37891,q:'Mercado Central de València',d:'Sabato fino alle 15:00. La Lonja è di fronte.'},
+    {id:'redonda',n:'Plaza Redonda',z:'Centro',k:'see',a:39.47358,o:-0.37660,q:'Plaza Redonda, València',d:'Piazza circolare nascosta tra le vie.'},
+    {id:'horchata',n:'Horchatería Santa Catalina',z:'Centro',k:'eat',a:39.47383,o:-0.37626,q:'Horchatería Santa Catalina, València',d:'Horchata con fartons.'},
+    {id:'riua',n:'La Riuà',z:'Centro',k:'eat',a:39.47396,o:-0.37385,q:'Restaurante La Riuà, Carrer del Mar 27, València',d:'Paella e cucina valenciana in centro. Prenotare.'},
+    {id:'catedral',n:'Cattedrale e Micalet',z:'Centro',k:'see',a:39.47532,o:-0.37562,q:'Torre del Micalet, València',d:'207 gradini fino in cima. Accanto c\'è Plaza de la Virgen.'},
+    {id:'horas',n:'Café de las Horas',z:'Centro',k:'eat',a:39.47707,o:-0.37559,q:'Café de las Horas, València',d:'Agua de València.'},
+    {id:'serranos',n:'Torres de Serranos',z:'Carmen',k:'see',a:39.47914,o:-0.37614,q:'Torres de Serranos, València',d:'Porta medievale sul Turia.'},
+    {id:'carmen',n:'Barrio del Carmen',z:'Carmen',k:'see',a:39.47620,o:-0.38018,q:'Plaça del Tossal, València',d:'Vicoli, street art e bar intorno a Plaza del Tossal. Bello anche la sera.'},
+    {id:'ayto',n:'Plaza del Ayuntamiento',z:'Centro',k:'see',a:39.47065,o:-0.37683,q:'Plaça de l\'Ajuntament, València',d:'La piazza principale della città.'},
+    {id:'nord',n:'Estació del Nord',z:'Centro',k:'see',a:39.46613,o:-0.37777,q:'Estació del Nord, València',d:'Stazione modernista con le piastrelle di arance.'},
+    {id:'ruzafa',n:'Ruzafa',z:'Ruzafa',k:'see',a:39.46204,o:-0.37139,q:'Mercat de Russafa, València',d:'Bar e ristoranti, la sera di Halloween.'},
+    {id:'turia',n:'Giardini del Turia',z:'Turia',k:'see',a:39.46616,o:-0.36044,q:'Jardí del Túria, Palau de la Música, València',d:'Il parco nel vecchio letto del fiume.'},
+    {id:'cac',n:'Città delle Arti e delle Scienze',z:'Turia',k:'see',a:39.45668,o:-0.35388,q:'Ciutat de les Arts i les Ciències, València',d:'Da vedere al tramonto, quando si accendono le luci.'}
+  ];
+  /* Percorsi veri a piedi (OSRM, profilo pedonale su dati OpenStreetMap) e linea L5 della metro */
+  var LEGS={"ayto":{"c":[[-0.37684,39.46762],[-0.37688,39.46763],[-0.37696,39.46764],[-0.37705,39.46767],[-0.3771,39.46768],[-0.37719,39.46771],[-0.37727,39.46773],[-0.37717,39.46787],[-0.37715,39.46792],[-0.37714,39.468],[-0.3771,39.46828],[-0.3771,39.46832],[-0.37709,39.46834],[-0.37709,39.46838],[-0.37709,39.46839],[-0.37708,39.46844],[-0.37698,39.46903],[-0.37698,39.4691],[-0.37696,39.46922],[-0.37695,39.46928],[-0.37694,39.46933],[-0.37694,39.46936],[-0.37701,39.46936],[-0.377,39.46964],[-0.37697,39.46967],[-0.37696,39.46974],[-0.37696,39.46979],[-0.37696,39.46984],[-0.37696,39.46991],[-0.37699,39.46993],[-0.37698,39.47024],[-0.37695,39.47035],[-0.37694,39.4706],[-0.37694,39.47064],[-0.37694,39.47065]],"d":375,"t":5},"cac":{"c":[[-0.33483,39.46486],[-0.33487,39.46468],[-0.33494,39.46442],[-0.33502,39.46413],[-0.33573,39.4642],[-0.33594,39.46422],[-0.33611,39.46426],[-0.33628,39.46428],[-0.33641,39.46429],[-0.33642,39.46427],[-0.33648,39.46421],[-0.3365,39.46419],[-0.33651,39.46417],[-0.33652,39.46415],[-0.33652,39.4641],[-0.33653,39.46406],[-0.33657,39.464],[-0.3368,39.46369],[-0.33681,39.46367],[-0.33684,39.46368],[-0.33687,39.46364],[-0.33691,39.46359],[-0.337,39.46349],[-0.33727,39.46319],[-0.33729,39.46316],[-0.33732,39.46313],[-0.3378,39.46267],[-0.33782,39.46265],[-0.33787,39.46262],[-0.33802,39.46249],[-0.3381,39.46242],[-0.33813,39.4624],[-0.33819,39.46236],[-0.33868,39.46193],[-0.33873,39.46191],[-0.33879,39.46191],[-0.33896,39.46196],[-0.33898,39.46193],[-0.33899,39.46191],[-0.33902,39.46185],[-0.33907,39.46177],[-0.33912,39.46172],[-0.33916,39.46164],[-0.3392,39.46162],[-0.33951,39.46144],[-0.33959,39.46144],[-0.33963,39.46141],[-0.33968,39.46138],[-0.3397,39.46131],[-0.34056,39.4608],[-0.34066,39.46073],[-0.3407,39.46071],[-0.34076,39.46068],[-0.3409,39.46059],[-0.34192,39.45997],[-0.34194,39.45996],[-0.34201,39.45992],[-0.34206,39.45989],[-0.34223,39.45978],[-0.34227,39.45976],[-0.34237,39.45972],[-0.34246,39.45971],[-0.34255,39.45971],[-0.34257,39.45969],[-0.34266,39.45962],[-0.34273,39.45957],[-0.34274,39.45956],[-0.34278,39.45952],[-0.3428,39.45946],[-0.34282,39.4594],[-0.34328,39.45912],[-0.34333,39.45909],[-0.34385,39.45877],[-0.3439,39.45875],[-0.34401,39.45872],[-0.34404,39.45871],[-0.34411,39.45866],[-0.34418,39.45862],[-0.3443,39.45854],[-0.34436,39.4585],[-0.34446,39.45844],[-0.34448,39.45842],[-0.34449,39.45838],[-0.34451,39.45835],[-0.34562,39.45765],[-0.3457,39.45761],[-0.34578,39.45756],[-0.34586,39.4575],[-0.34596,39.45753],[-0.34609,39.45746],[-0.34613,39.45733],[-0.34691,39.45684],[-0.34694,39.45682],[-0.34699,39.45684],[-0.34706,39.45687],[-0.34715,39.45691],[-0.34723,39.45693],[-0.34729,39.45694],[-0.34738,39.45696],[-0.34749,39.45708],[-0.34756,39.45704],[-0.3476,39.45701],[-0.34765,39.45699],[-0.3477,39.45696],[-0.34774,39.45695],[-0.34781,39.45693],[-0.34788,39.45691],[-0.3479,39.4569],[-0.34793,39.45689],[-0.34794,39.45687],[-0.34796,39.45686],[-0.34798,39.45684],[-0.34799,39.45683],[-0.34819,39.45671],[-0.34832,39.45659],[-0.34834,39.45657],[-0.34837,39.45651],[-0.3484,39.45646],[-0.34841,39.4564],[-0.34842,39.45635],[-0.34844,39.45631],[-0.34849,39.45626],[-0.3485,39.45625],[-0.34848,39.45623],[-0.34849,39.45623],[-0.3486,39.45612],[-0.34864,39.45609],[-0.34875,39.45606],[-0.34891,39.45599],[-0.34904,39.45594],[-0.34908,39.45587],[-0.34916,39.45588],[-0.34936,39.45574],[-0.3494,39.45571],[-0.34953,39.45561],[-0.34966,39.45553],[-0.3497,39.45552],[-0.34974,39.45552],[-0.34979,39.45554],[-0.34984,39.45557],[-0.34989,39.4556],[-0.35005,39.45571],[-0.35062,39.45608],[-0.35068,39.45612],[-0.35068,39.45611],[-0.35089,39.45594],[-0.35164,39.45643],[-0.35218,39.45679],[-0.35241,39.45658],[-0.35266,39.45633],[-0.35291,39.4561],[-0.35295,39.45607],[-0.35299,39.45603],[-0.35345,39.45634],[-0.35353,39.45638],[-0.35363,39.45643],[-0.35379,39.45645],[-0.35399,39.4565],[-0.35403,39.45652]],"d":2303,"t":31},"carmela":{"c":[[-0.33483,39.46486],[-0.33465,39.46559],[-0.33456,39.46591],[-0.33434,39.46681],[-0.33424,39.46728],[-0.33373,39.46724],[-0.3337,39.46731],[-0.33365,39.4673],[-0.33362,39.46732],[-0.33334,39.46729],[-0.33332,39.46738],[-0.33331,39.4675],[-0.33298,39.46748],[-0.33289,39.46815],[-0.33276,39.46814],[-0.33271,39.46814],[-0.33269,39.46821],[-0.33269,39.46824],[-0.3327,39.46827],[-0.33267,39.46828],[-0.33265,39.4683],[-0.33264,39.46833],[-0.33263,39.46836],[-0.33261,39.46846],[-0.33261,39.46848],[-0.33254,39.46849],[-0.33243,39.4685],[-0.33238,39.4685],[-0.33237,39.46854],[-0.33207,39.46848],[-0.33201,39.46847],[-0.33169,39.46841],[-0.33163,39.4684],[-0.33154,39.46838],[-0.33153,39.46842],[-0.33098,39.46833],[-0.33084,39.46901],[-0.3308,39.46919],[-0.33075,39.46941],[-0.33062,39.46999],[-0.33053,39.47042],[-0.3304,39.47093],[-0.33035,39.47091],[-0.33016,39.47171],[-0.33007,39.47203],[-0.33003,39.47208],[-0.32999,39.47212],[-0.32991,39.47254],[-0.32955,39.47251],[-0.32934,39.47337],[-0.32897,39.47333],[-0.32883,39.47398],[-0.32873,39.47411],[-0.32872,39.4742],[-0.32867,39.4742],[-0.32866,39.47421],[-0.32865,39.47424],[-0.32865,39.47426],[-0.32865,39.47432],[-0.32863,39.47432],[-0.32861,39.47432],[-0.3286,39.4744],[-0.3286,39.47463],[-0.3286,39.4747],[-0.32858,39.47472],[-0.32858,39.47478],[-0.3286,39.47482],[-0.32861,39.47485],[-0.32862,39.47491],[-0.32862,39.47496],[-0.32862,39.47499],[-0.32862,39.47502],[-0.32862,39.47505],[-0.32862,39.47507],[-0.32862,39.47508],[-0.32862,39.47509],[-0.32861,39.47515],[-0.32861,39.4752],[-0.3286,39.47524],[-0.3286,39.47528],[-0.32867,39.4753],[-0.32869,39.47531],[-0.32869,39.47535],[-0.32867,39.47569],[-0.32867,39.47573],[-0.32866,39.47653],[-0.32862,39.47772],[-0.32807,39.47769],[-0.32758,39.47769],[-0.32723,39.4777],[-0.32678,39.47771],[-0.32678,39.47834],[-0.32674,39.47864],[-0.32673,39.47927],[-0.32675,39.48038],[-0.32675,39.48135],[-0.32584,39.48132],[-0.32577,39.48132],[-0.32569,39.48133],[-0.32565,39.48224]],"d":2595,"t":35},"carmen":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37277,39.47035],[-0.3735,39.47038],[-0.37392,39.4704],[-0.37407,39.47049],[-0.37415,39.47056],[-0.37424,39.47052],[-0.3743,39.47049],[-0.37464,39.47048],[-0.37505,39.47046],[-0.37535,39.47044],[-0.3754,39.47045],[-0.37544,39.47045],[-0.37555,39.47045],[-0.37557,39.47045],[-0.37561,39.47044],[-0.37594,39.47042],[-0.37596,39.47042],[-0.37604,39.47042],[-0.37609,39.47043],[-0.37612,39.47044],[-0.37636,39.47081],[-0.37655,39.47112],[-0.37661,39.47124],[-0.37663,39.47129],[-0.37665,39.47133],[-0.37673,39.47181],[-0.37675,39.47196],[-0.3768,39.47196],[-0.37683,39.47195],[-0.37688,39.47195],[-0.3769,39.47196],[-0.37694,39.47198],[-0.37697,39.47199],[-0.377,39.472],[-0.37704,39.47203],[-0.37697,39.47212],[-0.37697,39.47216],[-0.37698,39.47219],[-0.37715,39.47241],[-0.37718,39.47245],[-0.37718,39.47247],[-0.37722,39.47252],[-0.37738,39.47274],[-0.37738,39.47275],[-0.37741,39.4728],[-0.37738,39.4728],[-0.37748,39.47293],[-0.3777,39.47323],[-0.3777,39.47324],[-0.3778,39.47335],[-0.37788,39.47344],[-0.3783,39.47385],[-0.37831,39.47388],[-0.37847,39.47405],[-0.37861,39.47413],[-0.37889,39.47446],[-0.37891,39.47449],[-0.37898,39.47454],[-0.37927,39.4747],[-0.37947,39.47486],[-0.37953,39.47489],[-0.37962,39.47493],[-0.37966,39.47494],[-0.37971,39.47495],[-0.37976,39.47496],[-0.37981,39.47497],[-0.37984,39.47504],[-0.37993,39.47528],[-0.38022,39.47601],[-0.38024,39.47603],[-0.3802,39.47603],[-0.38021,39.47607],[-0.38017,39.47614],[-0.38017,39.47616],[-0.38016,39.4762]],"d":1262,"t":17},"catedral":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37384,39.4734],[-0.37383,39.47344],[-0.37382,39.47349],[-0.37414,39.47356],[-0.37426,39.47358],[-0.37427,39.47393],[-0.37445,39.47398],[-0.37456,39.47401],[-0.37469,39.47404],[-0.37496,39.47411],[-0.37506,39.47413],[-0.37509,39.47414],[-0.37514,39.47415],[-0.37511,39.47436],[-0.37506,39.47477],[-0.37502,39.47505],[-0.37527,39.47511],[-0.37553,39.47518],[-0.37558,39.47519],[-0.37568,39.47523]],"d":915,"t":12},"h_mar":{"c":[[-0.33483,39.46486],[-0.33487,39.46468],[-0.33494,39.46442],[-0.33502,39.46413],[-0.33573,39.4642],[-0.33594,39.46422],[-0.33611,39.46426],[-0.33628,39.46428],[-0.33641,39.46429],[-0.33656,39.46435],[-0.33658,39.46431],[-0.33699,39.46443],[-0.33715,39.46447],[-0.33725,39.46452],[-0.33786,39.46481],[-0.3379,39.46482],[-0.33795,39.46482],[-0.338,39.46482],[-0.338,39.46486],[-0.33805,39.46486],[-0.33811,39.46484],[-0.33818,39.46482],[-0.33823,39.46481],[-0.33829,39.46481],[-0.33836,39.46482],[-0.33853,39.46487],[-0.33861,39.46489]],"d":419,"t":6},"horas":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37384,39.4734],[-0.37383,39.47344],[-0.37382,39.47349],[-0.37414,39.47356],[-0.37426,39.47358],[-0.37427,39.47393],[-0.37445,39.47398],[-0.37456,39.47401],[-0.37469,39.47404],[-0.37496,39.47411],[-0.37506,39.47413],[-0.37509,39.47414],[-0.37514,39.47415],[-0.37511,39.47436],[-0.37506,39.47477],[-0.37502,39.47505],[-0.37501,39.47507],[-0.3749,39.47519],[-0.37482,39.47541],[-0.37472,39.47552],[-0.37475,39.47554],[-0.37472,39.47557],[-0.37471,39.47556],[-0.37471,39.47557],[-0.3747,39.47558],[-0.37467,39.47561],[-0.37465,39.47562],[-0.37464,39.47563],[-0.37465,39.47563],[-0.37462,39.47566],[-0.37462,39.47566],[-0.37452,39.47575],[-0.37451,39.47581],[-0.37449,39.47588],[-0.3746,39.47595],[-0.37473,39.47601],[-0.37472,39.47606],[-0.37498,39.47609],[-0.37504,39.47609],[-0.375,39.47662],[-0.37507,39.47664],[-0.37513,39.47666],[-0.37516,39.47667],[-0.37514,39.47675],[-0.37549,39.47682],[-0.37554,39.47687],[-0.37556,39.47688],[-0.37556,39.47691],[-0.37555,39.47707]],"d":1170,"t":16},"horchata":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37429,39.47273],[-0.37445,39.47275],[-0.37481,39.47285],[-0.37516,39.47297],[-0.37524,39.47301],[-0.37541,39.47306],[-0.37574,39.47307],[-0.37601,39.47311],[-0.37605,39.47312],[-0.37609,39.47316],[-0.37617,39.47319],[-0.37628,39.47324],[-0.37621,39.47349],[-0.3761,39.47385],[-0.37612,39.47386],[-0.37614,39.47386],[-0.37619,39.47386],[-0.37623,39.47387],[-0.37624,39.47387],[-0.37626,39.47387]],"d":799,"t":11},"marina":{"c":[[-0.33483,39.46486],[-0.33487,39.46468],[-0.33494,39.46442],[-0.33502,39.46413],[-0.33412,39.46404],[-0.3336,39.46397],[-0.33294,39.4639],[-0.33308,39.46321],[-0.33265,39.46312],[-0.33227,39.46306],[-0.33189,39.46301],[-0.33153,39.463],[-0.33153,39.46303],[-0.3315,39.46303],[-0.33112,39.46301],[-0.33074,39.46299],[-0.33046,39.46299],[-0.33033,39.46304],[-0.33027,39.46299],[-0.33025,39.46297],[-0.33013,39.46283],[-0.33016,39.46282],[-0.33006,39.46272],[-0.32987,39.46284],[-0.32986,39.46284],[-0.32984,39.46283],[-0.32977,39.46276],[-0.32963,39.46261],[-0.3296,39.46258],[-0.32951,39.46236],[-0.32945,39.46237],[-0.32942,39.4623],[-0.32941,39.46227],[-0.32922,39.46231],[-0.32865,39.46233],[-0.32843,39.46234],[-0.32825,39.46232],[-0.3275,39.46227],[-0.32626,39.46217],[-0.32547,39.46211],[-0.32587,39.4617],[-0.32564,39.46168],[-0.32512,39.46151],[-0.32492,39.46136],[-0.32445,39.46067],[-0.32412,39.46081],[-0.32401,39.46086]],"d":1353,"t":18},"mercado":{"c":[[-0.37684,39.46762],[-0.37688,39.46763],[-0.37696,39.46764],[-0.37705,39.46767],[-0.3771,39.46768],[-0.37719,39.46771],[-0.37727,39.46773],[-0.37717,39.46787],[-0.37715,39.46792],[-0.37714,39.468],[-0.3771,39.46828],[-0.3771,39.46832],[-0.37709,39.46834],[-0.37709,39.46838],[-0.37709,39.46839],[-0.37708,39.46844],[-0.37698,39.46903],[-0.37698,39.4691],[-0.37696,39.46922],[-0.37695,39.46928],[-0.37694,39.46933],[-0.37694,39.46936],[-0.37701,39.46936],[-0.377,39.46964],[-0.37697,39.46967],[-0.37696,39.46974],[-0.37696,39.46979],[-0.37696,39.46984],[-0.37696,39.46991],[-0.37699,39.46993],[-0.37698,39.47024],[-0.37695,39.47035],[-0.37694,39.4706],[-0.37694,39.47064],[-0.37694,39.47074],[-0.37692,39.47106],[-0.37692,39.47127],[-0.37691,39.47179],[-0.37691,39.47181],[-0.37689,39.4719],[-0.37688,39.47193],[-0.37688,39.47195],[-0.3769,39.47196],[-0.37694,39.47198],[-0.37697,39.47199],[-0.377,39.472],[-0.37704,39.47203],[-0.37697,39.47212],[-0.37697,39.47216],[-0.37698,39.47219],[-0.37715,39.47241],[-0.37718,39.47245],[-0.37718,39.47247],[-0.37722,39.47252],[-0.37738,39.47274],[-0.37738,39.47275],[-0.37741,39.4728],[-0.3775,39.47281],[-0.37753,39.47282],[-0.37752,39.47288],[-0.37777,39.47322],[-0.37783,39.47322],[-0.37786,39.47323],[-0.37793,39.47324],[-0.37799,39.47325],[-0.37805,39.47326],[-0.37808,39.4733],[-0.37835,39.47326],[-0.37838,39.47326],[-0.37844,39.47325],[-0.37865,39.47322],[-0.37865,39.47322]],"d":774,"t":10},"montana":{"c":[[-0.33483,39.46486],[-0.33465,39.46559],[-0.33456,39.46591],[-0.33392,39.46587],[-0.33339,39.46583],[-0.33262,39.46577],[-0.33256,39.46576],[-0.332,39.46573],[-0.33178,39.46572],[-0.3316,39.46571],[-0.33114,39.46567],[-0.33081,39.46564],[-0.33082,39.46556]],"d":452,"t":6},"nord":{"c":[[-0.37684,39.46762],[-0.37688,39.46763],[-0.37696,39.46764],[-0.37705,39.46767],[-0.3771,39.46768],[-0.37719,39.46771],[-0.37727,39.46773],[-0.37728,39.46771],[-0.37731,39.46765],[-0.37735,39.46756],[-0.37735,39.46755],[-0.37737,39.46751],[-0.37748,39.46747],[-0.37748,39.46744],[-0.37747,39.46739],[-0.3775,39.46737],[-0.37754,39.46735],[-0.37757,39.46734],[-0.37753,39.46727],[-0.37763,39.46698],[-0.37763,39.46692],[-0.37761,39.46689],[-0.37763,39.46681],[-0.37787,39.46615]],"d":233,"t":3},"pascuala":{"c":[[-0.33483,39.46486],[-0.33465,39.46559],[-0.33456,39.46591],[-0.33434,39.46681],[-0.33424,39.46728],[-0.33373,39.46724],[-0.3337,39.46731],[-0.33365,39.4673],[-0.33362,39.46732],[-0.33334,39.46729],[-0.33332,39.46738],[-0.33331,39.4675],[-0.33298,39.46748],[-0.33289,39.46815],[-0.33276,39.46814],[-0.33271,39.46814],[-0.33269,39.46821],[-0.33269,39.46824],[-0.3327,39.46827],[-0.33267,39.46828],[-0.33265,39.4683],[-0.33264,39.46833],[-0.33263,39.46836],[-0.33261,39.46846],[-0.33261,39.46848],[-0.33254,39.46849],[-0.33243,39.4685],[-0.33238,39.4685],[-0.33237,39.46854],[-0.33207,39.46848],[-0.33201,39.46847],[-0.33169,39.46841],[-0.33163,39.4684],[-0.33154,39.46838],[-0.33153,39.46842],[-0.33098,39.46833],[-0.33084,39.46901],[-0.3308,39.46919],[-0.33075,39.46941],[-0.33062,39.46999],[-0.33053,39.47042],[-0.3304,39.47093],[-0.33035,39.47091],[-0.33016,39.47171],[-0.33007,39.47203],[-0.33003,39.47208],[-0.32999,39.47212],[-0.32991,39.47254],[-0.32955,39.47251],[-0.32934,39.47337],[-0.32897,39.47333],[-0.32867,39.47329],[-0.32836,39.47326],[-0.328,39.47322],[-0.3275,39.47316],[-0.32739,39.47394]],"d":1547,"t":21},"pepica":{"c":[[-0.33483,39.46486],[-0.33487,39.46468],[-0.33494,39.46442],[-0.33502,39.46413],[-0.33412,39.46404],[-0.3336,39.46397],[-0.33294,39.4639],[-0.33249,39.46386],[-0.33234,39.46385],[-0.33208,39.46382],[-0.3318,39.46377],[-0.33142,39.46374],[-0.33102,39.4637],[-0.33068,39.46368],[-0.33038,39.46368],[-0.33033,39.46368],[-0.32993,39.46366],[-0.32954,39.46364],[-0.32942,39.46361],[-0.32932,39.46359],[-0.32891,39.46357],[-0.32892,39.46351],[-0.32892,39.46347],[-0.32897,39.46319],[-0.32898,39.46307],[-0.32895,39.46304],[-0.32881,39.46302],[-0.32883,39.46294],[-0.32881,39.46292],[-0.32878,39.46289],[-0.32876,39.46285],[-0.32874,39.46283],[-0.32873,39.4628],[-0.32859,39.46284],[-0.32838,39.46292],[-0.32731,39.46305],[-0.32641,39.46304],[-0.32603,39.46303],[-0.32597,39.46299],[-0.32588,39.46299],[-0.32576,39.46298],[-0.32574,39.46298],[-0.32574,39.46301],[-0.32573,39.46303],[-0.32571,39.46304],[-0.32566,39.46304],[-0.32535,39.46304],[-0.32513,39.46304],[-0.32471,39.46303],[-0.3247,39.46307],[-0.32469,39.4631],[-0.32465,39.46318],[-0.32462,39.46323],[-0.32449,39.46324],[-0.32446,39.46325],[-0.32443,39.46326],[-0.32424,39.46326],[-0.32417,39.46326],[-0.32394,39.46326],[-0.32376,39.46328],[-0.32371,39.46328],[-0.32366,39.46329],[-0.32363,39.46329],[-0.32355,39.46329],[-0.32357,39.46339]],"d":1193,"t":16},"redonda":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37429,39.47273],[-0.37445,39.47275],[-0.37481,39.47285],[-0.37516,39.47297],[-0.37524,39.47301],[-0.37541,39.47306],[-0.37574,39.47307],[-0.37601,39.47311],[-0.37605,39.47312],[-0.37609,39.47316],[-0.37617,39.47319],[-0.37628,39.47324],[-0.37675,39.47332],[-0.37689,39.47346],[-0.37678,39.47351],[-0.37676,39.47349],[-0.37674,39.47347]],"d":794,"t":11},"riua":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37384,39.4734],[-0.37383,39.47344],[-0.37382,39.47349],[-0.37371,39.47387],[-0.37386,39.47389]],"d":654,"t":9},"ruzafa":{"c":[[-0.37684,39.46762],[-0.37678,39.4676],[-0.37676,39.4676],[-0.37674,39.46759],[-0.37652,39.46754],[-0.37593,39.46739],[-0.3759,39.46739],[-0.37527,39.46723],[-0.37523,39.46722],[-0.37518,39.46722],[-0.37499,39.46724],[-0.37492,39.46725],[-0.37492,39.46723],[-0.37486,39.46716],[-0.37483,39.46713],[-0.37481,39.4671],[-0.3748,39.46709],[-0.3748,39.46709],[-0.37477,39.46705],[-0.37481,39.46704],[-0.37441,39.46621],[-0.37438,39.46615],[-0.37435,39.46615],[-0.37433,39.46611],[-0.3743,39.46607],[-0.37432,39.46603],[-0.37416,39.46572],[-0.37389,39.4652],[-0.37394,39.46519],[-0.37392,39.46514],[-0.37383,39.46501],[-0.3738,39.46496],[-0.37374,39.46489],[-0.37368,39.46481],[-0.37359,39.46469],[-0.37358,39.46468],[-0.37354,39.46464],[-0.37268,39.46376],[-0.37263,39.46372],[-0.37254,39.46366],[-0.37252,39.46365],[-0.37245,39.46361],[-0.3723,39.46352],[-0.37213,39.46343],[-0.37199,39.46334],[-0.37198,39.46329],[-0.37194,39.46273],[-0.37196,39.46256],[-0.37196,39.46245],[-0.37156,39.46246],[-0.37147,39.46247],[-0.37142,39.46247],[-0.37138,39.46249],[-0.37134,39.46243],[-0.37134,39.46243],[-0.37156,39.46234],[-0.37154,39.46232],[-0.37157,39.46231]],"d":879,"t":12},"serranos":{"c":[[-0.37089,39.4702],[-0.37089,39.47024],[-0.37089,39.47026],[-0.37089,39.47029],[-0.37088,39.4703],[-0.37088,39.47034],[-0.37093,39.47034],[-0.37096,39.47034],[-0.37099,39.4703],[-0.371,39.47028],[-0.37101,39.47028],[-0.37103,39.47027],[-0.37104,39.47027],[-0.37109,39.47027],[-0.3718,39.4703],[-0.37182,39.47032],[-0.3721,39.47033],[-0.37243,39.47034],[-0.37247,39.47118],[-0.37255,39.47123],[-0.37253,39.4715],[-0.37257,39.47152],[-0.37257,39.47155],[-0.37336,39.47176],[-0.37369,39.47187],[-0.3737,39.47193],[-0.37373,39.47239],[-0.37373,39.47241],[-0.37379,39.47268],[-0.37402,39.47271],[-0.37384,39.4734],[-0.37383,39.47344],[-0.37382,39.47349],[-0.37414,39.47356],[-0.37426,39.47358],[-0.37482,39.4737],[-0.3752,39.47377],[-0.37525,39.47378],[-0.37535,39.4738],[-0.3756,39.47385],[-0.37572,39.47382],[-0.37585,39.47384],[-0.3759,39.4739],[-0.37582,39.4744],[-0.37578,39.47469],[-0.37569,39.47488],[-0.37573,39.4749],[-0.37591,39.47498],[-0.37605,39.47504],[-0.37607,39.47505],[-0.37619,39.47513],[-0.37629,39.47519],[-0.37647,39.4753],[-0.37631,39.4755],[-0.37637,39.47556],[-0.37659,39.47565],[-0.37663,39.47588],[-0.37672,39.4765],[-0.37673,39.4766],[-0.37685,39.47661],[-0.37686,39.47664],[-0.37687,39.47688],[-0.37688,39.477],[-0.37688,39.47702],[-0.37689,39.47727],[-0.37688,39.47739],[-0.37679,39.47759],[-0.37672,39.47775],[-0.37664,39.47793],[-0.37658,39.47806],[-0.37642,39.47843],[-0.37629,39.47873],[-0.37628,39.47876],[-0.37618,39.47892],[-0.37612,39.47904],[-0.37608,39.47912]],"d":1444,"t":19},"spiaggia":{"c":[[-0.33483,39.46486],[-0.33465,39.46559],[-0.33456,39.46591],[-0.33434,39.46681],[-0.33424,39.46728],[-0.33373,39.46724],[-0.3337,39.46731],[-0.33365,39.4673],[-0.33362,39.46732],[-0.33334,39.46729],[-0.33332,39.46738],[-0.33331,39.4675],[-0.33298,39.46748],[-0.33289,39.46815],[-0.33276,39.46814],[-0.33271,39.46814],[-0.33269,39.46821],[-0.33269,39.46824],[-0.3327,39.46827],[-0.33267,39.46828],[-0.33265,39.4683],[-0.33264,39.46833],[-0.33263,39.46836],[-0.33261,39.46846],[-0.33261,39.46848],[-0.33254,39.46849],[-0.33243,39.4685],[-0.33238,39.4685],[-0.33237,39.46854],[-0.33207,39.46848],[-0.33201,39.46847],[-0.33169,39.46841],[-0.33163,39.4684],[-0.33154,39.46838],[-0.33153,39.46842],[-0.33098,39.46833],[-0.33084,39.46901],[-0.3308,39.46919],[-0.33075,39.46941],[-0.33062,39.46999],[-0.33057,39.46998],[-0.33052,39.46997],[-0.33016,39.46993],[-0.32975,39.46988],[-0.32937,39.46983],[-0.329,39.46977],[-0.3286,39.46971],[-0.32853,39.4697],[-0.32844,39.46969],[-0.32812,39.46964],[-0.32809,39.46971],[-0.32805,39.46971],[-0.32801,39.46971],[-0.32795,39.46971],[-0.32793,39.46971],[-0.32791,39.46971],[-0.3279,39.46967],[-0.32785,39.46966],[-0.32711,39.46959],[-0.32652,39.46959],[-0.32648,39.46959],[-0.32645,39.46959],[-0.32643,39.46959],[-0.32643,39.46946],[-0.32638,39.46943],[-0.32624,39.46942],[-0.32572,39.46942],[-0.3257,39.46943],[-0.3257,39.46946],[-0.32568,39.46948],[-0.32564,39.46948],[-0.32562,39.46948],[-0.32561,39.46948],[-0.32556,39.46948],[-0.32552,39.46948],[-0.32549,39.46948],[-0.32545,39.46947],[-0.32545,39.46946],[-0.32541,39.46942],[-0.32494,39.46942],[-0.3249,39.46943],[-0.32488,39.46946],[-0.32484,39.46946],[-0.3248,39.46946],[-0.32476,39.46946],[-0.3247,39.46946],[-0.3247,39.46939],[-0.32468,39.46939],[-0.32466,39.46939],[-0.32443,39.46939],[-0.3244,39.46939],[-0.32433,39.46939],[-0.32426,39.46939],[-0.32417,39.46939],[-0.32408,39.46939],[-0.32405,39.46939],[-0.32402,39.46939],[-0.32394,39.46939],[-0.32394,39.46927],[-0.32394,39.46922],[-0.32276,39.46921]],"d":1619,"t":22},"turia":{"c":[[-0.35754,39.47241],[-0.35729,39.47234],[-0.35719,39.47234],[-0.35716,39.47232],[-0.35719,39.47225],[-0.35723,39.47218],[-0.35762,39.47141],[-0.35762,39.47139],[-0.35763,39.47134],[-0.35763,39.4713],[-0.35796,39.47065],[-0.35803,39.4705],[-0.35807,39.47043],[-0.35812,39.47033],[-0.35816,39.47025],[-0.35831,39.46995],[-0.35834,39.4699],[-0.35837,39.46983],[-0.3584,39.46977],[-0.35843,39.46977],[-0.35857,39.4696],[-0.35859,39.46958],[-0.3586,39.46956],[-0.35863,39.46954],[-0.35866,39.46952],[-0.35934,39.46903],[-0.35945,39.46894],[-0.35947,39.46893],[-0.35951,39.4689],[-0.35953,39.46888],[-0.35957,39.46886],[-0.35964,39.46881],[-0.3597,39.46876],[-0.35975,39.46873],[-0.35985,39.46865],[-0.36008,39.46851],[-0.36013,39.46841],[-0.36014,39.46827],[-0.36016,39.46823],[-0.3602,39.46814],[-0.36025,39.46804],[-0.36027,39.468],[-0.36,39.46745],[-0.35997,39.4674],[-0.35995,39.46735],[-0.35991,39.46729],[-0.3599,39.46727],[-0.35997,39.46725],[-0.36001,39.46724],[-0.36006,39.46722],[-0.35966,39.4664],[-0.35975,39.46637],[-0.35995,39.46631],[-0.36006,39.46628],[-0.35995,39.46607],[-0.35997,39.46606],[-0.36032,39.46594]],"d":896,"t":12}};
+  var ST={MAR:['Marítim',39.46486,-0.33863,0],AYO:['Ayora',39.46777,-0.34313,2],AMI:['Amistat',39.47033,-0.35049,4],ARA:['Aragó',39.47241,-0.35754,6],ALA:['Alameda',39.47311,-0.36602,8],COL:['Colón',39.47019,-0.37084,10],XAT:['Xàtiva',39.46755,-0.37687,12]};
+  var L5=['MAR','AYO','AMI','ARA','ALA','COL','XAT'];
+  var VIA={redonda:'COL',horchata:'COL',riua:'COL',catedral:'COL',horas:'COL',serranos:'COL',carmen:'COL',mercado:'XAT',ayto:'XAT',nord:'XAT',ruzafa:'XAT',turia:'ARA'};
+  var WAIT=5;
+  var H=P[0];
+  function fmtD(m){return m<1000?(Math.round(m/10)*10)+' m':(m/1000).toFixed(1).replace('.',',')+' km'}
+  P.forEach(function(p){
+    if(p.id==='hotel'){p.t=0;return}
+    var to=VIA[p.id];
+    if(to){
+      var w1=LEGS.h_mar, w2=LEGS[p.id];
+      p.metro=to; p.walk=false; p.t=w1.t+WAIT+ST[to][3]+w2.t; p.dist=w1.d+w2.d;
+    } else { p.walk=true; p.t=LEGS[p.id].t; p.dist=LEGS[p.id].d; }
+  });
+
+  /* ---------- Mappa reale in stile Mappe di Apple ---------- */
+  var map=null, markers={};
+  function base(){return new URL('.',location.href).href}
+  function isDark(){var t=document.documentElement.getAttribute('data-theme');return t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches}
+  var PAL={
+    light:{land:'#f2efe9',bld:'#e4dfd7',bldl:'#d7d1c8',park:'#cfe6bf',wood:'#c2deae',water:'#a6d1f0',wtxt:'#3d7fb3',sand:'#f4ebd0',minor:'#ffffff',minorC:'#ddd7cd',major:'#fde397',majorC:'#e8c35b',mway:'#f8c26a',mwayC:'#d99c3c',path:'#c9c2b6',rail:'#bdb6ab',txt:'#4d4a45',txt2:'#7a746b',halo:'#ffffff',place:'#6b665e'},
+    dark:{land:'#232427',bld:'#303136',bldl:'#3a3b40',park:'#22382a',wood:'#1f331f',water:'#173550',wtxt:'#7fb3dc',sand:'#33302a',minor:'#3e4045',minorC:'#2a2b2f',major:'#6b5e3a',majorC:'#4f4630',mway:'#7d6233',mwayC:'#5a4626',path:'#4a4b50',rail:'#55565b',txt:'#dcdcdc',txt2:'#a0a0a0',halo:'#232427',place:'#b8b8b8'}
+  };
+  var C_EAT='#f5922f', C_SEE='#e8578a', C_HOME='#8e5cd9', C_WALK='#0a84ff', C_L5='#3aa655';
+  function mapStyle(){
+    var c=isDark()?PAL.dark:PAL.light, F=['NotoSansRegular'], FB=['NotoSansBold'];
+    var W=function(a,b,c2,d){return ['interpolate',['exponential',1.6],['zoom'],12,a,15,b,17,c2,18,d]};
+    var MAJ=['in','class','primary','secondary','tertiary','trunk'];
+    return {version:8,
+      glyphs:'vtb://fonts/{fontstack}/{range}',
+      sources:{v:{type:'vector',tiles:['vtb://vt/{z}/{x}/{y}'],minzoom:10,maxzoom:14},
+               route:{type:'geojson',data:{type:'FeatureCollection',features:[]}}},
+      layers:[
+        {id:'bg',type:'background',paint:{'background-color':c.land}},
+        {id:'landcover',type:'fill',source:'v','source-layer':'landcover',filter:['in','class','grass','wood','sand','farmland'],paint:{'fill-color':['match',['get','class'],'sand',c.sand,'wood',c.wood,c.park]}},
+        {id:'park',type:'fill',source:'v','source-layer':'park',paint:{'fill-color':c.park}},
+        {id:'landuse',type:'fill',source:'v','source-layer':'landuse',filter:['in','class','pitch','playground','cemetery','stadium'],paint:{'fill-color':c.park,'fill-opacity':.7}},
+        {id:'water',type:'fill',source:'v','source-layer':'water',paint:{'fill-color':c.water}},
+        {id:'building',type:'fill',source:'v','source-layer':'building',minzoom:14.5,paint:{'fill-color':c.bld,'fill-outline-color':c.bldl,'fill-opacity':['interpolate',['linear'],['zoom'],14.5,0,15.5,1]}},
+        {id:'path',type:'line',source:'v','source-layer':'transportation',filter:['in','class','path','track'],minzoom:15,paint:{'line-color':c.path,'line-width':1,'line-dasharray':[2,1.5]}},
+        {id:'rail',type:'line',source:'v','source-layer':'transportation',filter:['all',['==','class','rail'],['!=','brunnel','tunnel']],minzoom:12,paint:{'line-color':c.rail,'line-width':1.4}},
+        {id:'minor-case',type:'line',source:'v','source-layer':'transportation',filter:['in','class','minor','service','pedestrian'],minzoom:14,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':c.minorC,'line-width':W(.5,3.5,9,16)}},
+        {id:'major-case',type:'line',source:'v','source-layer':'transportation',filter:MAJ,layout:{'line-join':'round'},paint:{'line-color':c.majorC,'line-width':W(1.6,6,14,24)}},
+        {id:'mway-case',type:'line',source:'v','source-layer':'transportation',filter:['==','class','motorway'],layout:{'line-join':'round'},paint:{'line-color':c.mwayC,'line-width':W(2,7,15,26)}},
+        {id:'minor',type:'line',source:'v','source-layer':'transportation',filter:['in','class','minor','service','pedestrian'],minzoom:13,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':c.minor,'line-width':W(.4,2.5,7.5,14)}},
+        {id:'major',type:'line',source:'v','source-layer':'transportation',filter:MAJ,layout:{'line-join':'round'},paint:{'line-color':c.major,'line-width':W(1,4.6,12,21)}},
+        {id:'mway',type:'line',source:'v','source-layer':'transportation',filter:['==','class','motorway'],layout:{'line-join':'round'},paint:{'line-color':c.mway,'line-width':W(1.2,5.5,13,23)}},
+        {id:'route-metro-case',type:'line',source:'route',filter:['==',['get','m'],'metro'],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#ffffff','line-width':9}},
+        {id:'route-metro',type:'line',source:'route',filter:['==',['get','m'],'metro'],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':C_L5,'line-width':5.5}},
+        {id:'route-walk',type:'line',source:'route',filter:['==',['get','m'],'walk'],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':C_WALK,'line-width':5.5,'line-dasharray':[0,1.6]}},
+        {id:'route-stop',type:'circle',source:'route',filter:['==',['get','m'],'stop'],paint:{'circle-radius':5,'circle-color':'#ffffff','circle-stroke-color':C_L5,'circle-stroke-width':2.5}},
+        {id:'route-stop-name',type:'symbol',source:'route',filter:['all',['==',['get','m'],'stop'],['==',['get','end'],true]],layout:{'text-field':['get','s'],'text-font':FB,'text-size':11.5,'text-offset':[0,1.2],'text-anchor':'top'},paint:{'text-color':C_L5,'text-halo-color':c.halo,'text-halo-width':2}},
+        {id:'road-name',type:'symbol',source:'v','source-layer':'transportation_name',minzoom:14.5,
+          layout:{'symbol-placement':'line','text-field':['coalesce',['get','name:ca'],['get','name']],'text-font':F,'text-size':['interpolate',['linear'],['zoom'],14.5,10,17,12.5],'text-max-angle':30},
+          paint:{'text-color':c.txt2,'text-halo-color':c.halo,'text-halo-width':1.6}},
+        {id:'water-name',type:'symbol',source:'v','source-layer':'water_name',layout:{'text-field':['get','name'],'text-font':F,'text-size':12.5,'text-letter-spacing':.1},paint:{'text-color':c.wtxt,'text-halo-color':c.water,'text-halo-width':1}},
+        {id:'poi-dot',type:'circle',source:'v','source-layer':'poi',minzoom:15.5,
+          filter:['all',['<=',['get','rank'],18],['in',['get','class'],['literal',['restaurant','cafe','bar','fast_food','ice_cream','bakery','beer','museum','art_gallery','attraction','place_of_worship','monument','castle','theatre','park','garden']]]],
+          paint:{'circle-radius':4,'circle-stroke-width':1.5,'circle-stroke-color':c.halo,
+            'circle-color':['match',['get','class'],['restaurant','cafe','bar','fast_food','ice_cream','bakery','beer'],C_EAT,['park','garden'],'#46a35a',C_SEE],'circle-opacity':.85}},
+        {id:'poi-name',type:'symbol',source:'v','source-layer':'poi',minzoom:16,
+          filter:['all',['<=',['get','rank'],18],['in',['get','class'],['literal',['restaurant','cafe','bar','fast_food','ice_cream','bakery','beer','museum','art_gallery','attraction','place_of_worship','monument','castle','theatre','park','garden']]]],
+          layout:{'text-field':['get','name'],'text-font':F,'text-size':10.5,'text-anchor':'left','text-offset':[.8,0],'text-max-width':8,'text-optional':true},
+          paint:{'text-color':['match',['get','class'],['restaurant','cafe','bar','fast_food','ice_cream','bakery','beer'],'#c4701c',['park','garden'],'#3a8a4b','#c4426f'],'text-halo-color':c.halo,'text-halo-width':1.4}},
+        {id:'metro-st',type:'circle',source:'v','source-layer':'poi',minzoom:12.5,filter:['all',['==',['get','class'],'railway'],['==',['get','subclass'],'subway']],
+          paint:{'circle-radius':['interpolate',['linear'],['zoom'],12.5,4,16,8],'circle-color':'#e2231a','circle-stroke-color':'#ffffff','circle-stroke-width':1.5}},
+        {id:'metro-m',type:'symbol',source:'v','source-layer':'poi',minzoom:14,filter:['all',['==',['get','class'],'railway'],['==',['get','subclass'],'subway']],
+          layout:{'text-field':'M','text-font':FB,'text-size':9.5,'text-allow-overlap':true},paint:{'text-color':'#ffffff'}},
+        {id:'metro-name',type:'symbol',source:'v','source-layer':'poi',minzoom:14.5,filter:['all',['==',['get','class'],'railway'],['==',['get','subclass'],'subway']],
+          layout:{'text-field':['get','name'],'text-font':FB,'text-size':11,'text-anchor':'top','text-offset':[0,1]},paint:{'text-color':'#c21b14','text-halo-color':c.halo,'text-halo-width':1.6}},
+        {id:'place',type:'symbol',source:'v','source-layer':'place',filter:['in','class','suburb','quarter','neighbourhood'],maxzoom:16.5,
+          layout:{'text-field':['get','name'],'text-font':FB,'text-size':['interpolate',['linear'],['zoom'],12,10.5,16,13.5],'text-transform':'uppercase','text-letter-spacing':.1,'text-max-width':8},
+          paint:{'text-color':c.place,'text-halo-color':c.halo,'text-halo-width':1.6,'text-opacity':.8}}
+      ]};
+  }
+  /* I dati della mappa sono pubblicati come testo (gzip + base64): li decodifico qui */
+  function registerProtocol(){
+    maplibregl.addProtocol('vtb',function(params){
+      var path=params.url.replace('vtb://','');
+      return fetch(base()+'mapdata/'+path+'.txt').then(function(r){
+        if(!r.ok) return {data:new ArrayBuffer(0)};
+        return r.text().then(function(b64){
+          var s=atob(b64.replace(/\s/g,'')), u=new Uint8Array(s.length);
+          for(var i=0;i<s.length;i++) u[i]=s.charCodeAt(i);
+          return new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+        }).then(function(buf){return {data:buf}});
+      });
+    });
+  }
+  function routeFeatures(p){
+    if(!p||p.id==='hotel') return [];
+    var f=[], line=function(m,c){f.push({type:'Feature',properties:{m:m},geometry:{type:'LineString',coordinates:c}})};
+    if(p.walk){ line('walk',LEGS[p.id].c); return f; }
+    line('walk',LEGS.h_mar.c);
+    var stops=L5.slice(0,L5.indexOf(p.metro)+1);
+    line('metro',stops.map(function(s){return [ST[s][2],ST[s][1]]}));
+    stops.forEach(function(s,i){f.push({type:'Feature',properties:{m:'stop',s:ST[s][0],end:i===0||i===stops.length-1},geometry:{type:'Point',coordinates:[ST[s][2],ST[s][1]]}})});
+    line('walk',LEGS[p.id].c);
+    return f;
+  }
+  function setRoute(p){
+    if(!map||!map.getSource('route'))return;
+    map.getSource('route').setData({type:'FeatureCollection',features:routeFeatures(p)});
+  }
+  var GLYPH={
+    eat:'<path d="M7 3v7.5M5 3v5a2 2 0 0 0 4 0V3M7 10.5V21M17 3c-2.2 1.6-3.2 4.2-3.2 7.5H17V21" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    see:'<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="#fff"/>',
+    home:'<path d="M3 19V6M3 14h18v5M21 14v-2.5A3.5 3.5 0 0 0 17.5 8H11v6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="11" r="2" fill="#fff"/>'
+  };
+  function initMap(){
+    var el=document.getElementById('map');
+    if(!window.maplibregl){el.innerHTML='<p class="hint" style="padding:16px">La mappa non si è caricata. Usate l\'elenco qui a fianco.</p>';return}
+    if(!window.DecompressionStream){el.innerHTML='<p class="hint" style="padding:16px">Aggiornate il browser per vedere la mappa. Intanto usate l\'elenco qui a fianco.</p>';return}
+    registerProtocol();
+    try{
+      map=new maplibregl.Map({container:el,style:mapStyle(),center:[-0.352,39.468],zoom:13,minZoom:11.5,maxZoom:18.5,
+        maxBounds:[[-0.43,39.425],[-0.29,39.505]],attributionControl:false,dragRotate:false,pitchWithRotate:false});
+    }catch(e){el.innerHTML='<p class="hint" style="padding:16px">La mappa non è supportata su questo dispositivo. Usate l\'elenco qui a fianco.</p>';return}
+    map.touchZoomRotate.disableRotation();
+    P.forEach(function(p){
+      var m=document.createElement('button');
+      m.className='mk '+p.k; m.setAttribute('aria-label',p.n);
+      m.innerHTML='<span class="b"><svg viewBox="0 0 24 24" width="15" height="15">'+GLYPH[p.k]+'</svg></span><em>'+p.n+'</em>';
+      m.addEventListener('click',function(e){e.stopPropagation();select(p.id,true)});
+      markers[p.id]=new maplibregl.Marker({element:m,anchor:'center'}).setLngLat([p.o,p.a]).addTo(map);
+    });
+    var lab=function(){el.classList.toggle('zl',map.getZoom()>=15.2)};
+    map.on('zoom',lab); lab();
+    map.on('load',function(){setRoute(cur)});
+    map.fitBounds([[-0.382,39.454],[-0.322,39.481]],{padding:24,duration:0});
+    var restyle=function(){map.setStyle(mapStyle());map.once('styledata',function(){setTimeout(function(){setRoute(cur)},50)})};
+    var mq=window.matchMedia('(prefers-color-scheme: dark)');
+    if(mq.addEventListener) mq.addEventListener('change',restyle);
+    new MutationObserver(restyle).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  }
+
+  /* Posizione con punto blu e direzione. Fuori dal visualizzatore di Claude (che blocca la geolocalizzazione) */
+  var meMarker=null, meWatch=null, meFirst=true, meEl=null;
+  function meMsg(t){var m=document.getElementById('me-msg');m.textContent=t;m.hidden=!t;if(t)setTimeout(function(){m.hidden=true},7000)}
+  function onHeading(e){
+    var h=e.webkitCompassHeading!=null?e.webkitCompassHeading:(e.absolute&&e.alpha!=null?360-e.alpha:null);
+    if(h==null||!meEl) return;
+    meEl.classList.add('dir'); meEl.style.setProperty('--h',h+'deg');
+  }
+  function startHeading(){
+    var add=function(){window.addEventListener('deviceorientationabsolute',onHeading);window.addEventListener('deviceorientation',onHeading)};
+    if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){
+      DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')add()}).catch(function(){});
+    } else add();
+  }
+  document.getElementById('z-me').addEventListener('click',function(){
+    var b=this;
+    if(meWatch!==null){
+      if(meMarker){map.flyTo({center:meMarker.getLngLat(),zoom:Math.max(map.getZoom(),15.5)});return}
+    }
+    if(!navigator.geolocation||!map){meMsg('Posizione non disponibile su questo dispositivo.');return}
+    startHeading();
+    meFirst=true;
+    meWatch=navigator.geolocation.watchPosition(function(pos){
+      var ll=[pos.coords.longitude,pos.coords.latitude];
+      b.classList.add('on');
+      if(!meMarker){meEl=document.createElement('div');meEl.className='me';meEl.innerHTML='<i class="cone"></i><i class="pulse"></i><i class="dot"></i>';meMarker=new maplibregl.Marker({element:meEl}).setLngLat(ll).addTo(map)} else meMarker.setLngLat(ll);
+      if(meFirst){meFirst=false;var inside=ll[0]>-0.43&&ll[0]<-0.29&&ll[1]>39.425&&ll[1]<39.505;
+        if(inside) map.flyTo({center:ll,zoom:16}); else meMsg('Siete fuori dalla zona della mappa: il punto blu comparirà quando sarete a Valencia.');}
+    },function(err){
+      navigator.geolocation.clearWatch(meWatch);meWatch=null;b.classList.remove('on');
+      meMsg(err.code===1?'La posizione è bloccata qui. Aprite la web app sul telefono oppure usate "Portami qui".':'Non riesco a trovare la posizione, riprovate tra poco.');
+    },{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+  });
+  document.getElementById('z-in').addEventListener('click',function(){map&&map.zoomIn()});
+  document.getElementById('z-out').addEventListener('click',function(){map&&map.zoomOut()});
+  document.getElementById('z-all').addEventListener('click',function(){map&&map.fitBounds([[-0.382,39.454],[-0.322,39.481]],{padding:24})});
+  document.getElementById('z-center').addEventListener('click',function(){map&&map.flyTo({center:[-0.3768,39.4742],zoom:15})});
+
+  var list=document.getElementById('places'), cur=null;
+  P.forEach(function(p){
+    var li=document.createElement('li'), b=document.createElement('button');
+    b.dataset.id=p.id;
+    b.innerHTML='<span><i class="ld '+p.k+'"></i>'+p.n+'</span><span>'+(p.id==='hotel'?'casa':p.t+' min')+'</span>';
+    b.addEventListener('click',function(){select(p.id,true)});
+    li.appendChild(b); list.appendChild(li);
+  });
+  function gmaps(p){
+    return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(p.q)+'&travelmode='+(p.walk?'walking':'transit');
+  }
+  function select(id,move){
+    var p=P.find(function(x){return x.id===id}); cur=p;
+    Object.keys(markers).forEach(function(k){markers[k].getElement().classList.toggle('on',k===id)});
+    list.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.id===id)});
+    document.getElementById('d-zone').textContent=p.z;
+    document.getElementById('d-name').textContent=p.n;
+    document.getElementById('d-note').textContent=p.d;
+    var from=document.getElementById('d-from');
+    if(p.id==='hotel'){
+      from.innerHTML='<dt>Dall\'aeroporto</dt><dd>metro L5 diretta fino a Marítim, poi 6 min a piedi</dd>'+
+        '<dt>Per il centro</dt><dd>metro L5 da Marítim a Colón, circa 25 min in tutto</dd>'+
+        '<dt>Spiaggia</dt><dd>'+LEGS.spiaggia.t+' min a piedi</dd>';
+    } else if(p.walk){
+      from.innerHTML='<dt>Dall\'hotel</dt><dd><b>'+p.t+' min</b> a piedi · '+fmtD(p.dist)+'</dd>'+
+        '<dt class="wk">A piedi</dt><dd>percorso blu sulla mappa</dd>';
+    } else {
+      var s=ST[p.metro], nst=L5.indexOf(p.metro);
+      from.innerHTML='<dt>Dall\'hotel</dt><dd><b>circa '+p.t+' min</b> con la metro</dd>'+
+        '<dt class="wk">A piedi</dt><dd>'+LEGS.h_mar.t+' min fino a Marítim</dd>'+
+        '<dt class="l5">Metro L5</dt><dd>direzione Aeroport, '+nst+' fermate fino a '+s[0]+' ('+s[3]+' min + attesa)</dd>'+
+        '<dt class="wk">A piedi</dt><dd>'+LEGS[p.id].t+' min fino a destinazione</dd>';
+    }
+    var go=document.getElementById('d-go');
+    go.href=gmaps(p); go.textContent=p.id==='hotel'?'Portami in hotel':'Portami qui';
+    document.getElementById('d-open').href='https://maps.apple.com/?daddr='+encodeURIComponent(p.q)+'&dirflg='+(p.walk?'w':'r');
+    setRoute(p);
+    if(map&&move){
+      if(p.id==='hotel'){map.flyTo({center:[p.o,p.a],zoom:15.5});return}
+      var pts=[[H.o,H.a],[p.o,p.a]];
+      routeFeatures(p).forEach(function(f){if(f.geometry.type==='LineString')pts=pts.concat(f.geometry.coordinates)});
+      var lo=pts.map(function(x){return x[0]}), la=pts.map(function(x){return x[1]});
+      map.fitBounds([[Math.min.apply(0,lo),Math.min.apply(0,la)],[Math.max.apply(0,lo),Math.max.apply(0,la)]],{padding:{top:70,bottom:50,left:70,right:70},maxZoom:16.5});
+    }
+  }
+  select('hotel',false);
+  if(document.readyState==='complete') initMap(); else window.addEventListener('load',initMap);
+
+
+  /* ---------- Da fare ---------- */
+  var TODOS=[
+    {id:'paella',t:'Paella valenciana',n:'A pranzo, da La Riuà',p:'riua',c:'eat',i:'paella'},
+    {id:'bagno',t:'Bagno al tramonto',n:'Il mare è ancora tiepido',p:'spiaggia',c:'see',i:'wave'},
+    {id:'montana',t:'Tapas da Casa Montaña',n:'Taverna del 1836',p:'montana',c:'eat',i:'wine'},
+    {id:'horchata',t:'Horchata con fartons',n:'Plaza Santa Catalina',p:'horchata',c:'eat',i:'horchata'},
+    {id:'mercado',t:'Mercado Central',n:'Solo sabato mattina',p:'mercado',c:'see',i:'market'},
+    {id:'micalet',t:'Salire sul Micalet',n:'207 gradini, vista sulla città',p:'catedral',c:'see',i:'tower'},
+    {id:'lonja',t:'Lonja de la Seda',n:'Gotico, patrimonio UNESCO',p:'mercado',c:'see',i:'lonja'},
+    {id:'cac',t:'Città delle Arti',n:'Al tramonto, con le luci',p:'cac',c:'see',i:'calatrava'},
+    {id:'turia',t:'Giardini del Turia',n:'Il parco nel vecchio fiume',p:'turia',c:'see',i:'tree'},
+    {id:'agua',t:'Agua de València',n:'Al Café de las Horas',p:'horas',c:'eat',i:'cocktail'},
+    {id:'pascuala',t:'Bocadillo da La Pascuala',n:'Enorme, istituzione del quartiere',p:'pascuala',c:'eat',i:'bocadillo'},
+    {id:'halloween',t:'Notte di Halloween',n:'In maschera tra i bar',p:'ruzafa',c:'see',i:'pumpkin'},
+    {id:'huesos',t:'Huesos de santo',n:'Il dolce di Ognissanti',p:'horchata',c:'eat',i:'sweet'},
+    {id:'facciate',t:'Facciate di piastrelle',n:'Le case colorate del Cabanyal',p:'hotel',c:'see',i:'tiles'},
+    {id:'marina',t:'Passeggiata alla Marina',n:'Porto e Veles e Vents',p:'marina',c:'see',i:'boat'},
+    {id:'carmen',t:'Barrio del Carmen',n:'Vicoli e street art',p:'carmen',c:'see',i:'tiles'},
+    {id:'nord',t:'Estació del Nord',n:'Stazione modernista',p:'nord',c:'see',i:'lonja'},
+    {id:'redonda',t:'Plaza Redonda',n:'La piazza circolare',p:'redonda',c:'see',i:'market'}
+  ];
+  var box=document.getElementById('todos'), filterCat='all';
+  var PIN='<svg class="ill" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  TODOS.forEach(function(d){
+    var pl=P.find(function(x){return x.id===d.p});
+    var w=document.createElement('div'); w.className='tw'; w.dataset.c=d.c;
+    var b=document.createElement('button');
+    b.className='todo '+d.c;
+    b.setAttribute('aria-pressed',store.get('vlc-'+d.id)==='1'?'true':'false');
+    b.innerHTML='<span class="ic"><svg class="ill" viewBox="0 0 48 48"><use href="#i-'+d.i+'"/></svg></span><span><h3>'+d.t+'</h3><p>'+d.n+'</p><span class="z">'+pl.z+'</span></span>';
+    b.addEventListener('click',function(){
+      var on=b.getAttribute('aria-pressed')!=='true';
+      b.setAttribute('aria-pressed',on);store.set('vlc-'+d.id,on?'1':'0');progress();
+    });
+    var g=document.createElement('button'); g.className='goto'; g.innerHTML=PIN; g.setAttribute('aria-label','Mostra '+pl.n+' sulla mappa'); g.title='Mostra sulla mappa';
+    g.addEventListener('click',function(){select(pl.id);document.querySelector('.map').scrollIntoView({behavior:'smooth',block:'start'})});
+    w.appendChild(b); w.appendChild(g); box.appendChild(w);
+  });
+  function progress(){
+    var all=TODOS.length, done=box.querySelectorAll('.todo[aria-pressed="true"]').length;
+    document.getElementById('count').textContent=done+' / '+all;
+    document.getElementById('bar').style.width=(done/all*100)+'%';
+  }
+  document.querySelectorAll('.filters .f').forEach(function(f){
+    f.addEventListener('click',function(){
+      filterCat=f.dataset.f;
+      document.querySelectorAll('.filters .f').forEach(function(x){x.setAttribute('aria-pressed',x===f)});
+      [].forEach.call(box.children,function(w){w.hidden=filterCat!=='all'&&w.dataset.c!==filterCat});
+    });
+  });
+  progress();
+
+  /* ---------- Programma ---------- */
+  function T(d,hm){return new Date(d+'T'+hm+':00+01:00')}
+  var DAYS=[
+    ['2026-10-30',[
+      ['14:00','Volo da Malpensa','Arrivo alle 15:55',1],
+      ['16:15','Metro L5 diretta fino a Marítim','Poi 6 min a piedi. Oppure taxi, circa €25'],
+      ['17:00','Check-in e via','Lasciate gli zaini al Kora Lluna',1],
+      ['17:30','Spiaggia fino al tramonto',''],
+      ['19:00','Vermut e tapas da Casa Montaña','Al Cabanyal, vicino all\'hotel'],
+      ['20:30','Metro L5 da Marítim a Colón','10 minuti, poi a piedi'],
+      ['21:00','Centro illuminato e cena nel Carmen','Plaza de la Virgen, poi tapas nel Barrio del Carmen',1]]],
+    ['2026-10-31',[
+      ['09:30','Metro L5 da Marítim a Colón','10 minuti, poi a piedi'],
+      ['10:00','Mercado Central e Lonja','Il mercato chiude alle 15:00',1],
+      ['11:15','Horchata in Plaza Santa Catalina','Passando da Plaza Redonda'],
+      ['11:45','Cattedrale, Micalet e Plaza de la Virgen','',1],
+      ['13:00','Barrio del Carmen e Torres de Serranos','Vicoli e street art'],
+      ['14:30','Paella da La Riuà','In centro, da prenotare',1],
+      ['16:30','Giardini del Turia','A piedi o in bici fino alla Città delle Arti'],
+      ['18:00','Città delle Arti al tramonto','',1],
+      ['21:30','Cena e Halloween a Ruzafa','']]],
+    ['2026-11-01',[
+      ['09:00','Colazione e passeggiata sul mare',''],
+      ['11:00','Check-out','',1],
+      ['11:15','Metro L5 da Marítim all\'aeroporto','Domenica festiva, treni ogni 15–20 min'],
+      ['14:25','Volo per Malpensa','Arrivo alle 16:25',1]]]
+  ];
+  var EVENTS=[{d:T('2026-10-29','14:00'),t:'Check-in online Ryanair'},{d:T('2026-10-30','23:00'),t:'Check-in online Wizz Air',skip:1}];
+  DAYS.forEach(function(day){day[1].forEach(function(r){EVENTS.push({d:T(day[0],r[0]),t:r[1],n:r[2]})})});
+  EVENTS=EVENTS.filter(function(e){return !e.skip}).sort(function(a,b){return a.d-b.d});
+  var END=T('2026-11-01','16:25');
+
+  var rows=document.getElementById('rows'), tabs=document.querySelectorAll('[data-day]'), curDay=0;
+  function renderDay(i){
+    curDay=i; var now=new Date(), list=DAYS[i][1], html='';
+    tabs.forEach(function(t){t.setAttribute('aria-pressed',+t.dataset.day===i)});
+    list.forEach(function(r,k){
+      var s=T(DAYS[i][0],r[0]), nx=list[k+1]?T(DAYS[i][0],list[k+1][0]):new Date(s.getTime()+2*36e5);
+      var cls=(r[3]?'key ':'')+(now>=nx?'past':(now>=s?'cur':''));
+      html+='<li class="'+cls+'"><time>'+r[0]+'</time><span class="dot"></span><div><h3>'+r[1]+'</h3>'+(r[2]?'<p class="note">'+r[2]+'</p>':'')+'</div></li>';
+    });
+    rows.innerHTML=html;
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){renderDay(+t.dataset.day)})});
+
+  /* ---------- Adesso ---------- */
+  function rel(ms){
+    var m=Math.round(ms/6e4); if(m<60) return 'tra '+m+' min';
+    var h=Math.floor(m/60); if(h<24) return 'tra '+h+' h '+(m%60)+' min';
+    var d=Math.floor(h/24); return 'tra '+d+(d===1?' giorno':' giorni');
+  }
+  var fmt=new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Rome'});
+  function tick(){
+    var now=new Date(), next=EVENTS.find(function(e){return e.d>now});
+    var start=T('2026-10-30','14:00'), dd=Math.ceil((start-now)/864e5);
+    var days=document.getElementById('days'), dl=document.getElementById('days-lbl');
+    if(now<start){days.textContent=dd;dl.textContent=dd===1?'Giorno alla partenza':'Giorni alla partenza'}
+    else if(now<END){days.textContent='In viaggio';days.style.fontSize='20px';dl.textContent='Buon weekend'}
+    else{days.textContent='Fatto';dl.textContent='Bentornati'}
+    if(!next||now>END){
+      document.getElementById('now-label').textContent='Fine';
+      document.getElementById('now-what').textContent='Bentornati a casa';
+      document.getElementById('now-when').textContent='';
+      document.getElementById('after-what').textContent='';document.getElementById('after-when').textContent='';
+      return;
+    }
+    var i=EVENTS.indexOf(next), after=EVENTS[i+1];
+    document.getElementById('now-label').textContent='Prossimo';
+    document.getElementById('now-what').textContent=next.t;
+    document.getElementById('now-when').textContent=fmt.format(next.d)+' · '+rel(next.d-now);
+    document.getElementById('after-what').textContent=after?'Poi: '+after.t:'';
+    document.getElementById('after-when').textContent=after?fmt.format(after.d).split(', ').pop():'';
+  }
+  tick(); setInterval(function(){tick();renderDay(curDay)},60000);
+  var n=new Date(), k=n.getFullYear()*10000+(n.getMonth()+1)*100+n.getDate();
+  renderDay({20261031:1,20261101:2}[k]||0);
+
+  /* ---------- Copia ---------- */
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var done=function(){b.textContent='copiato';setTimeout(function(){b.textContent='copia'},1500)};
+      if(navigator.clipboard){navigator.clipboard.writeText(b.dataset.copy).then(done,function(){})}
+    });
+  });
+})();
+</script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js')})}</script>
+</body>
+</html>
